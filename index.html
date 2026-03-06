@@ -3,76 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>團購配對系統</title>
+    <title>揪團配對中...</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f4f4; }
-        #status-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 80%; text-align: center; }
-        .loading { color: #00b900; font-weight: bold; margin: 10px 0; }
-        .success { color: #e74c3c; font-weight: bold; font-size: 1.2em; }
-        .btn { background-color: #00b900; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; display: none; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .status-tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
+        .content-text { line-height: 1.8; color: #333; white-space: pre-wrap; font-size: 15px; }
+        .highlight { color: #d32f2f; font-weight: bold; }
+        .loading-bar { height: 6px; background: #eee; border-radius: 3px; margin: 20px 0; overflow: hidden; }
+        .progress { height: 100%; background: #00b900; width: 0%; transition: width 1s ease; }
+        .btn { background: #00b900; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; }
+        .user-list { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 14px; text-align: left; }
     </style>
 </head>
 <body>
 
-<div id="status-card">
-    <div id="content">正在初始化...</div>
-    <button id="closeBtn" class="btn" onclick="sendAndClose()">確認並返回聊天室</button>
+<div class="card">
+    <div id="statusTag" class="status-tag">系統啟動中</div>
+    <div class="loading-bar"><div id="progressBar" class="progress"></div></div>
+    <div id="displayArea" class="content-text">正在初始化配對環境...</div>
+    <button id="actionBtn" class="btn" onclick="completeProcess()">確認並領取折扣碼</button>
 </div>
 
 <script>
-    const liffId = '2009338553-kxBbv5XD'; // 請替換成你在 LINE Developers 申請的 LIFF ID
+    const LIFF_ID = '2009338553-kxBbv5XD'; // 請確認這是你的正確 ID
+    
+    // 隨機資料庫
+    const locations = ["新北市", "台中市", "台北市", "彰化縣", "高雄市", "桃園市", "台南市", "新竹市"];
+    const names = ["林", "張", "陳", "王", "李", "劉", "趙", "吳", "許"];
+    
+    // 取得隨機整數
+    const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const randPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-    async function initLiff() {
+    async function init() {
         try {
-            await liff.init({ liffId });
-            startMatchingProcess();
-        } catch (error) {
-            console.error('LIFF 初始化失敗', error);
-        }
+            await liff.init({ liffId: LIFF_ID });
+            startFlow();
+        } catch (e) { document.getElementById('displayArea').innerText = "啟動失敗，請重新開啟"; }
     }
 
-    function updateText(text, delay) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                document.getElementById('content').innerText = text;
-                resolve();
-            }, delay);
-        });
+    async function startFlow() {
+        const area = document.getElementById('displayArea');
+        const progress = document.getElementById('progressBar');
+        const tag = document.getElementById('statusTag');
+
+        // --- 第一階段 ---
+        const waitingUsers = randInt(100, 200);
+        const waitingMins = randInt(1, 3);
+        tag.innerText = "搜尋在線用戶";
+        progress.style.width = "15%";
+        area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神...\n目前在線等待人數：<span class="highlight">${waitingUsers}</span> 人\n⏳ 系統配對中，請稍候 <span class="highlight">${waitingMins}</span> 分鐘。\n(配對成功後將由系統自動發送專屬折扣碼)`;
+
+        // --- 第二階段 (設定 1 分鐘後，教學建議測試時改 5000 毫秒) ---
+        setTimeout(() => {
+            tag.innerText = "媒合中 66%";
+            progress.style.width = "66%";
+            const loc1 = randPick(locations);
+            const name1 = randPick(names);
+            area.innerHTML = `🔍 系統搜尋進度：66%\n👤 已成功媒合一位隊友：<span class="highlight">"${loc1}"・"${name1}"小姐</span> (已就位)\n👤 正在搜尋最後一位隊友...\n預計剩餘等待時間：2 分鐘，請勿關閉對話視窗。`;
+        }, 60000); 
+
+        // --- 第三階段 (設定 3 分鐘後，教學建議測試時改 15000 毫秒) ---
+        setTimeout(() => {
+            tag.innerText = "配對完成";
+            tag.style.background = "#ffebee";
+            tag.style.color = "#c62828";
+            progress.style.width = "100%";
+            
+            const loc1 = randPick(locations); // 保持一致性建議存成變數
+            const name1 = randPick(names);
+            const loc2 = randPick(locations);
+            const name2 = randPick(names);
+            const price = randInt(950, 999);
+
+            area.innerHTML = `✨ 配對成功！三人團已達成 ✨\n<div class="user-list">1️⃣ 您 (等待中)\n2️⃣ "${loc1}"・"${name1}"小姐 (已就位)\n3️⃣ "${loc2}"・"${name2}"小姐 (已就位)</div>💰 您的專屬湊團價：<span class="highlight">$${price}</span>\n\n⚠️ 最後步驟：\n為了保障另外兩位隊友的權益，請於 <span class="highlight">1 小時內</span> 完成結帳。若您逾時未付，系統將自動剔除您的名額，並開放給下一位候補隊友。`;
+            document.getElementById('actionBtn').style.display = "block";
+        }, 180000);
     }
 
-    async function startMatchingProcess() {
-        const content = document.getElementById('content');
-        
-        await updateText("收到配對需求", 500);
-        content.innerHTML += '<div class="loading">正在配對...</div>';
-        
-        await updateText("已與新北市的客戶配對\n預計還要 3 分鐘等待", 2000);
-        
-        await updateText("🎉 完成配對！", 2000);
-        content.innerHTML += `
-            <div class="success">折扣碼：GROUP888</div>
-            <p style="font-size: 0.9em; color: #666;">需要在 1 小時內完成付款</p>
-        `;
-        
-        document.getElementById('closeBtn').style.display = 'block';
-    }
-
-    async function sendAndClose() {
-        // 使用 liff.sendMessages 將折扣碼自動發送到聊天室
+    async function completeProcess() {
+        const discountCode = "MATCH" + randInt(1000, 9999);
         try {
             await liff.sendMessages([{
-                'type': 'text',
-                'text': '我已完成配對，折扣碼是：GROUP888。我準備好要結帳了！'
+                type: 'text',
+                text: `【系統通知】配對成功！\n專屬折扣碼：${discountCode}\n結帳金額：進行人工確認中\n請告知客服人員您已準備好結帳。`
             }]);
-            liff.closeWindow(); // 關閉 LIFF 視窗回到聊天室
-        } catch (error) {
-            alert('傳送失敗，請手動輸入折扣碼');
+            liff.closeWindow();
+        } catch (e) {
+            alert("請先將官方帳號加入好友，才能自動傳送折扣碼喔！");
             liff.closeWindow();
         }
     }
 
-    initLiff();
+    init();
 </script>
 
 </body>
