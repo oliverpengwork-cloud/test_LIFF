@@ -118,7 +118,7 @@
         try {
             await liff.sendMessages([{
                 type: 'text',
-                text: `【系統通知】配對成功！\n專屬折扣碼：${codeToSend}\n結帳金額：進行人工確認中\n請告知客服人員您已準備好結帳。`
+                text: `【系統通知】配對成功！\n\n為了保障另外兩位隊友的權益，請於 1 小時內 完成結帳。若您逾時未付，系統將自動剔除您的名額，並開放給下一位候補隊友。\n\n專屬折扣碼：${codeToSend}\n結帳金額：967元\n稍後客服確認配對結果，可完成結帳。`
             }]);
             liff.closeWindow();
         } catch (e) {
