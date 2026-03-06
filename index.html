@@ -7,14 +7,27 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .card { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
         .status-tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
-        .content-text { line-height: 1.8; color: #333; white-space: pre-wrap; font-size: 15px; }
+        .content-text { line-height: 1.8; color: #333; white-space: pre-wrap; font-size: 15px; text-align: left; }
         .highlight { color: #d32f2f; font-weight: bold; }
         .loading-bar { height: 6px; background: #eee; border-radius: 3px; margin: 20px 0; overflow: hidden; }
         .progress { height: 100%; background: #00b900; width: 0%; transition: width 1s ease; }
         .btn { background: #00b900; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; }
         .user-list { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 14px; text-align: left; }
+        
+        /* 測試按鈕樣式 */
+        .test-reset-btn {
+            background: none;
+            border: 1px dashed #ccc;
+            color: #999;
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 30px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -23,7 +36,10 @@
     <div id="statusTag" class="status-tag">系統啟動中</div>
     <div class="loading-bar"><div id="progressBar" class="progress"></div></div>
     <div id="displayArea" class="content-text">正在初始化配對環境...</div>
+    
     <button id="actionBtn" class="btn" onclick="completeProcess()">確認並領取折扣碼</button>
+    
+    <button class="test-reset-btn" onclick="resetTest()">🛠️ 測試專用：清除紀錄並重跑動畫</button>
 </div>
 
 <script>
@@ -35,11 +51,16 @@
     const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
     const randPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+    // 測試重置功能
+    function resetTest() {
+        localStorage.removeItem('liff_match_record');
+        location.reload(); // 重新整理頁面
+    }
+
     async function init() {
         try {
             await liff.init({ liffId: LIFF_ID });
             
-            // --- 記憶功能：檢查是否有配對紀錄 ---
             const savedData = localStorage.getItem('liff_match_record');
             if (savedData) {
                 renderFinalStage(JSON.parse(savedData));
@@ -54,7 +75,6 @@
         const progress = document.getElementById('progressBar');
         const tag = document.getElementById('statusTag');
 
-        // 先鎖定這一次配對的所有隨機資料
         const matchData = {
             waitingUsers: randInt(100, 200),
             waitingMins: randInt(1, 2),
@@ -65,27 +85,25 @@
             mate2_Name: randPick(names)
         };
 
-        // --- 第一階段 ---
+        // 第一階段
         tag.innerText = "搜尋在線用戶";
         progress.style.width = "15%";
-        area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神...\n目前在線等待人數：<span class="highlight">${matchData.waitingUsers}</span> 人\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。\n(配對成功後將由系統自動發送專屬折扣碼)`;
+        area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神...\n目前在線等待人數：<span class="highlight">${matchData.waitingUsers}</span> 人\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
 
-        // --- 第二階段 (設定 10 秒後) ---
+        // 第二階段 (10秒後)
         setTimeout(() => {
             tag.innerText = "媒合中 66%";
             progress.style.width = "66%";
             area.innerHTML = `🔍 系統搜尋進度：66%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n 一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n預計剩餘等待時間：2 分鐘，請勿關閉對話視窗。`;
         }, 10000); 
 
-        // --- 第三階段 (設定 60 秒後) ---
+        // 第三階段 (60秒後)
         setTimeout(() => {
-            // 儲存紀錄到手機 localStorage
             localStorage.setItem('liff_match_record', JSON.stringify(matchData));
             renderFinalStage(matchData);
         }, 60000);
     }
 
-    // 專門用來顯示「配對完成」畫面的函式 (供 init 和 startFlow 調用)
     function renderFinalStage(data) {
         const area = document.getElementById('displayArea');
         const progress = document.getElementById('progressBar');
@@ -96,7 +114,7 @@
         tag.style.color = "#c62828";
         progress.style.width = "100%";
 
-        area.innerHTML = `✨ 配對成功！三人團已達成 ✨\n<div class="user-list">1️⃣ 您 (等待中)\n2️⃣ ${data.mate1_Loc}・${data.mate1_Name}小姐 (已就位)\n3️⃣ ${data.mate2_Loc}・${data.mate2_Name}小姐 (已就位)</div>💰 您的專屬湊團價：<span class="highlight">$967</span>\n\n⚠️ 最後步驟：\n為了保障另外兩位隊友的權益，請於 <span class="highlight">1 小時內</span> 完成結帳。若您逾時未付，系統將自動剔除您的名額，並開放給下一位候補隊友。`;
+        area.innerHTML = `✨ 配對成功！三人團已達成 ✨\n<div class="user-list">1️⃣ 您 (等待中)\n2️⃣ ${data.mate1_Loc}・${data.mate1_Name}小姐 (已就位)\n3️⃣ ${data.mate2_Loc}・${data.mate2_Name}小姐 (已就位)</div>💰 您的專屬湊團價：<span class="highlight">$${data.finalPrice}</span>\n\n⚠️ 最後步驟：\n為了保障另外兩位隊友的權益，請於 <span class="highlight">1 小時內</span> 完成結帳。若您逾時未付，系統將自動剔除您的名額，並開放給下一位候補隊友。`;
         document.getElementById('actionBtn').style.display = "block";
     }
 
@@ -109,7 +127,7 @@
             }]);
             liff.closeWindow();
         } catch (e) {
-            alert("請先將官方帳號加入好友，才能自動傳送折扣碼喔！");
+            alert("請先將官方帳號加入好友");
             liff.closeWindow();
         }
     }
