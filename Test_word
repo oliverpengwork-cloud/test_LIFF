@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>團購配對系統</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f4f4; }
+        #status-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 80%; text-align: center; }
+        .loading { color: #00b900; font-weight: bold; margin: 10px 0; }
+        .success { color: #e74c3c; font-weight: bold; font-size: 1.2em; }
+        .btn { background-color: #00b900; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; display: none; }
+    </style>
+</head>
+<body>
+
+<div id="status-card">
+    <div id="content">正在初始化...</div>
+    <button id="closeBtn" class="btn" onclick="sendAndClose()">確認並返回聊天室</button>
+</div>
+
+<script>
+    const liffId = 'YOUR_LIFF_ID'; // 請替換成你在 LINE Developers 申請的 LIFF ID
+
+    async function initLiff() {
+        try {
+            await liff.init({ liffId });
+            startMatchingProcess();
+        } catch (error) {
+            console.error('LIFF 初始化失敗', error);
+        }
+    }
+
+    function updateText(text, delay) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                document.getElementById('content').innerText = text;
+                resolve();
+            }, delay);
+        });
+    }
+
+    async function startMatchingProcess() {
+        const content = document.getElementById('content');
+        
+        await updateText("收到配對需求", 500);
+        content.innerHTML += '<div class="loading">正在配對...</div>';
+        
+        await updateText("已與新北市的客戶配對\n預計還要 3 分鐘等待", 2000);
+        
+        await updateText("🎉 完成配對！", 2000);
+        content.innerHTML += `
+            <div class="success">折扣碼：GROUP888</div>
+            <p style="font-size: 0.9em; color: #666;">需要在 1 小時內完成付款</p>
+        `;
+        
+        document.getElementById('closeBtn').style.display = 'block';
+    }
+
+    async function sendAndClose() {
+        // 使用 liff.sendMessages 將折扣碼自動發送到聊天室
+        try {
+            await liff.sendMessages([{
+                'type': 'text',
+                'text': '我已完成配對，折扣碼是：GROUP888。我準備好要結帳了！'
+            }]);
+            liff.closeWindow(); // 關閉 LIFF 視窗回到聊天室
+        } catch (error) {
+            alert('傳送失敗，請手動輸入折扣碼');
+            liff.closeWindow();
+        }
+    }
+
+    initLiff();
+</script>
+
+</body>
+</html>
