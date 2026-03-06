@@ -88,7 +88,7 @@
             tag.innerText = "媒合中";
             progress.style.width = "89%";
             area.innerHTML = `🔍 系統搜尋進度：89%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$${matchData.finalPrice}</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
-        }, 3000); 
+        }, 9000); 
         
         setTimeout(() => {
             localStorage.setItem('liff_match_record', JSON.stringify(matchData));
