@@ -15,19 +15,7 @@
         .progress { height: 100%; background: #00b900; width: 0%; transition: width 1s ease; }
         .btn { background: #00b900; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; }
         .user-list { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 14px; text-align: left; }
-        
-        /* 測試按鈕樣式 */
-        .test-reset-btn {
-            background: none;
-            border: 1px dashed #ccc;
-            color: #999;
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-top: 30px;
-            cursor: pointer;
-        }
+        .test-reset-btn { background: none; border: 1px dashed #ccc; color: #999; width: 100%; padding: 10px; border-radius: 10px; font-size: 12px; margin-top: 30px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -35,23 +23,24 @@
 <div class="card">
     <div id="statusTag" class="status-tag">系統啟動中</div>
     <div class="loading-bar"><div id="progressBar" class="progress"></div></div>
-    <div id="displayArea" class="content-text">正在初始化配對環境...</div>
+    
+    <div id="titleArea" class="content-text" style="text-align:center; font-weight:bold; margin-bottom:10px;"></div>
     
     <button id="actionBtn" class="btn" onclick="completeProcess()">確認並領取折扣碼</button>
+    
+    <div id="displayArea" class="content-text">正在初始化配對環境...</div>
     
     <button class="test-reset-btn" onclick="resetTest()">🛠️ 測試專用：清除紀錄並重跑動畫</button>
 </div>
 
 <script>
     const LIFF_ID = '2009338553-kxBbv5XD'; 
-    
     const locations = ["新北市", "台中市", "台北市", "高雄市", "桃園市", "台南市", "彰化縣", "屏東縣", "雲林縣", "新竹縣", "苗栗縣", "嘉義縣", "南投縣", "宜蘭縣", "新竹市", "基隆市", "花蓮縣", "台東縣", "嘉義市"];
     const names = ["陳", "林", "李", "張", "王", "吳", "劉", "蔡", "楊", "許", "鄭", "謝", "洪", "郭", "邱", "曾", "廖", "賴", "徐", "周", "葉", "蘇", "莊", "呂", "江", "何", "蕭", "羅", "高", "潘", "詹", "馮", "游", "盧", "朱", "程", "趙", "彭", "顏", "余", "柯", "翁", "魏", "孫", "戴", "范", "方", "宋"];
     
     const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
     const randPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-    // 重置功能：清除快取並刷新
     function resetTest() {
         localStorage.removeItem('liff_match_record');
         location.reload();
@@ -60,8 +49,6 @@
     async function init() {
         try {
             await liff.init({ liffId: LIFF_ID });
-            
-            // 檢查是否有儲存過的配對資料
             const savedData = localStorage.getItem('liff_match_record');
             if (savedData) {
                 renderFinalStage(JSON.parse(savedData));
@@ -76,7 +63,6 @@
         const progress = document.getElementById('progressBar');
         const tag = document.getElementById('statusTag');
 
-        // 【關鍵】在流程開始就鎖定所有資料，包括折扣碼
         const matchData = {
             waitingUsers: randInt(100, 200),
             waitingMins: randInt(1, 2),
@@ -85,30 +71,27 @@
             mate1_Name: randPick(names),
             mate2_Loc: randPick(locations),
             mate2_Name: randPick(names),
-            discountCode: "MATCH" + randInt(1000, 9999) // 預先產生固定折扣碼
+            discountCode: "MATCH" + randInt(1000, 9999)
         };
 
-        // 第一階段
         tag.innerText = "搜尋在線用戶";
         progress.style.width = "15%";
         area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神...\n目前在線等待人數：<span class="highlight">${matchData.waitingUsers}</span> 人\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
 
-        // 第二階段 (10秒後)
         setTimeout(() => {
             tag.innerText = "媒合中 66%";
             progress.style.width = "66%";
-            area.innerHTML = `🔍 系統搜尋進度：66%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n 一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$${matchData.finalPrice}</span>。\n\n預計剩餘等待時間：2 分鐘，請勿關閉對話視窗。`;
+            area.innerHTML = `🔍 系統搜尋進度：66%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$${matchData.finalPrice}</span>。\n\n預計剩餘等待時間：2 分鐘，請勿關閉對話視窗。`;
         }, 7000); 
 
-        // 第三階段 (60秒後)
         setTimeout(() => {
-            // 將整包資料（含折扣碼）存入快取
             localStorage.setItem('liff_match_record', JSON.stringify(matchData));
             renderFinalStage(matchData);
         }, 20000);
     }
 
     function renderFinalStage(data) {
+        const titleArea = document.getElementById('titleArea');
         const area = document.getElementById('displayArea');
         const progress = document.getElementById('progressBar');
         const tag = document.getElementById('statusTag');
@@ -118,23 +101,19 @@
         tag.style.color = "#c62828";
         progress.style.width = "100%";
 
-        area.innerHTML = `✨ 配對成功！三人團已達成 ✨`;
+        // 1. 設定標題內容
+        titleArea.innerHTML = `✨ 配對成功！三人團已達成 ✨`;
+
+        // 2. 顯示按鈕 (此時它會位於 titleArea 下方，displayArea 上方)
         document.getElementById('actionBtn').style.display = "block";
+
+        // 3. 設定名單與說明文字
         area.innerHTML = `<div class="user-list">1️⃣ 您 (等待中)\n2️⃣ ${data.mate1_Loc}・${data.mate1_Name}小姐 (已就位)\n3️⃣ ${data.mate2_Loc}・${data.mate2_Name}小姐 (已就位)</div>💰 您的專屬湊團價：<span class="highlight">$${data.finalPrice}</span>\n\n⚠️ 最後步驟：\n為了保障另外兩位隊友的權益，請於 <span class="highlight">1 小時內</span> 完成結帳。若您逾時未付，系統將自動剔除您的名額，並開放給下一位候補隊友。`;
-        
     }
 
     async function completeProcess() {
-        // 從快取讀取鎖定的折扣碼
         const savedData = localStorage.getItem('liff_match_record');
-        let codeToSend = "";
-
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            codeToSend = data.discountCode;
-        } else {
-            codeToSend = "MATCH" + randInt(1000, 9999);
-        }
+        let codeToSend = savedData ? JSON.parse(savedData).discountCode : "MATCH888";
 
         try {
             await liff.sendMessages([{
