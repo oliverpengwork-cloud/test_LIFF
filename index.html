@@ -51,16 +51,17 @@
     const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
     const randPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-    // 測試重置功能
+    // 重置功能：清除快取並刷新
     function resetTest() {
         localStorage.removeItem('liff_match_record');
-        location.reload(); // 重新整理頁面
+        location.reload();
     }
 
     async function init() {
         try {
             await liff.init({ liffId: LIFF_ID });
             
+            // 檢查是否有儲存過的配對資料
             const savedData = localStorage.getItem('liff_match_record');
             if (savedData) {
                 renderFinalStage(JSON.parse(savedData));
@@ -75,6 +76,7 @@
         const progress = document.getElementById('progressBar');
         const tag = document.getElementById('statusTag');
 
+        // 【關鍵】在流程開始就鎖定所有資料，包括折扣碼
         const matchData = {
             waitingUsers: randInt(100, 200),
             waitingMins: randInt(1, 2),
@@ -82,7 +84,8 @@
             mate1_Loc: randPick(locations),
             mate1_Name: randPick(names),
             mate2_Loc: randPick(locations),
-            mate2_Name: randPick(names)
+            mate2_Name: randPick(names),
+            discountCode: "MATCH" + randInt(1000, 9999) // 預先產生固定折扣碼
         };
 
         // 第一階段
@@ -94,11 +97,12 @@
         setTimeout(() => {
             tag.innerText = "媒合中 66%";
             progress.style.width = "66%";
-            area.innerHTML = `🔍 系統搜尋進度：66%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n 一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n預計剩餘等待時間：2 分鐘，請勿關閉對話視窗。`;
+            area.innerHTML = `🔍 系統搜尋進度：66%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n 一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$${matchData.finalPrice}</span>。\n預計剩餘等待時間：2 分鐘，請勿關閉對話視窗。`;
         }, 10000); 
 
         // 第三階段 (60秒後)
         setTimeout(() => {
+            // 將整包資料（含折扣碼）存入快取
             localStorage.setItem('liff_match_record', JSON.stringify(matchData));
             renderFinalStage(matchData);
         }, 60000);
@@ -119,11 +123,21 @@
     }
 
     async function completeProcess() {
-        const discountCode = "MATCH" + randInt(1000, 9999);
+        // 從快取讀取鎖定的折扣碼
+        const savedData = localStorage.getItem('liff_match_record');
+        let codeToSend = "";
+
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            codeToSend = data.discountCode;
+        } else {
+            codeToSend = "MATCH" + randInt(1000, 9999);
+        }
+
         try {
             await liff.sendMessages([{
                 type: 'text',
-                text: `【系統通知】配對成功！\n專屬折扣碼：${discountCode}\n結帳金額：進行人工確認中\n請告知客服人員您已準備好結帳。`
+                text: `【系統通知】配對成功！\n專屬折扣碼：${codeToSend}\n結帳金額：進行人工確認中\n請告知客服人員您已準備好結帳。`
             }]);
             liff.closeWindow();
         } catch (e) {
