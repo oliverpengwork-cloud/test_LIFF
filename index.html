@@ -15,6 +15,9 @@
         .progress { height: 100%; background: #00b900; width: 0%; transition: width 1s ease; }
         .btn { background: #00b900; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; display: none; }
         .user-list { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 14px; text-align: left; }
+        
+        /* 頁尾灰色小字樣式 */
+        .footer-note { font-size: 11px; color: #999; margin-top: 25px; text-align: center; border-top: 1px solid #eee; padding-top: 15px; }
     </style>
 </head>
 <body>
@@ -28,15 +31,14 @@
     <button id="actionBtn" class="btn" onclick="completeProcess()">確認並領取折扣碼</button>
     
     <div id="displayArea" class="content-text">正在初始化配對環境...</div>
+
+    <div class="footer-note">本系統為「團購媒合模擬流程」，成功後將取得優惠資格。</div>
 </div>
 
 <script>
     const LIFF_ID = '2009343030-brDdMLTX'; 
-    const locations = ["新北市", "台中市", "台北市", "高雄市", "桃園市", "台南市", "彰化縣", "屏東縣", "雲林縣", "新竹縣", "苗栗縣", "嘉義縣", "南投縣", "宜蘭縣", "新竹市", "基隆市", "花蓮縣", "台東縣", "嘉義市"];
-    const names = ["陳", "林", "李", "張", "王", "吳", "劉", "蔡", "楊", "許", "鄭", "謝", "洪", "郭", "邱", "曾", "廖", "賴", "徐", "周", "葉", "蘇", "莊", "呂", "江", "何", "蕭", "羅", "高", "潘", "詹", "馮", "游", "盧", "朱", "程", "趙", "彭", "顏", "余", "柯", "翁", "魏", "孫", "戴", "范", "方", "宋"];
-    
     const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-    const randPick = (arr) => arr[arr.length * Math.random() | 0];
+    const randPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
     async function init() {
         try {
@@ -55,44 +57,118 @@
         const progress = document.getElementById('progressBar');
         const tag = document.getElementById('statusTag');
 
-        // 固定數值與隨機隊友資訊
         const matchData = {
             waitingUsers: randInt(100, 200),
             waitingMins: randInt(1, 2),
-            mate1_Loc: randPick(locations),
-            mate1_Name: randPick(names),
-            mate2_Loc: randPick(locations),
-            mate2_Name: randPick(names),
             discountCode: "MATCH" + randInt(1000, 9999)
         };
 
-        // 階段 0：啟動
         tag.innerText = "搜尋在線用戶";
         progress.style.width = "15%";
-        area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神...\n目前在線等待人數：<span class="highlight">${matchData.waitingUsers}</span> 人\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
+        area.innerHTML = `🚀 揪團配對系統已啟動\馬上為您搜尋全台同步在線的女神！\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
 
-        // 階段 1：66% (6秒後)
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "18%";
+            area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神！\n系統正在媒合其他會員<span class="highlight">..</span>\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
+        }, 2000); 
+
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "22%";
+            area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神！\n系統正在媒合其他會員<span class="highlight">...</span>\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
+        }, 3000); 
+        
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "30%";
+            area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神！\n系統正在媒合其他會員<span class="highlight">.</span>\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
+        }, 4000);       
+        
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "35%";
+            area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神！\n系統正在媒合其他會員<span class="highlight">..</span>\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
+        }, 5000); 
+
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "37%";
+            area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神！\n系統正在媒合其他會員<span class="highlight">...</span>\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
+        }, 6000); 
+        
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "40%";
+            area.innerHTML = `🚀 揪團配對系統已啟動\n正在為您搜尋全台同步在線的女神！\n系統正在媒合其他會員<span class="highlight">.</span>\n⏳ 系統配對中，請稍候 <span class="highlight">${matchData.waitingMins}</span> 分鐘。`;
+        }, 7000);       
+        
         setTimeout(() => {
             tag.innerText = "媒合中";
             progress.style.width = "66%";
-            area.innerHTML = `🔍 系統搜尋進度：66%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">2 分鐘</span>，請勿關閉對話視窗。`;
-        }, 6000); 
+            area.innerHTML = `🔍 系統搜尋進度：66%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">..</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 9000); 
 
-        // 階段 2：80% (9秒後)
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "66%";
+            area.innerHTML = `🔍 系統搜尋進度：66%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">...</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 10000); 
+        
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "66%";
+            area.innerHTML = `🔍 系統搜尋進度：66%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">.</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 11000); 
+        
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "66%";
+            area.innerHTML = `🔍 系統搜尋進度：66%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">..</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 12000); 
+        
         setTimeout(() => {
             tag.innerText = "媒合中";
             progress.style.width = "80%";
-            area.innerHTML = `🔍 系統搜尋進度：80%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
-        }, 9000); 
+            area.innerHTML = `🔍 系統搜尋進度：80%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">...</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 13000); 
 
-        // 階段 3：92% (14秒後)
         setTimeout(() => {
             tag.innerText = "媒合中";
             progress.style.width = "92%";
-            area.innerHTML = `🔍 系統搜尋進度：92%\n👤 已成功媒合一位隊友：<span class="highlight">${matchData.mate1_Loc}</span>・<span class="highlight">${matchData.mate1_Name}小姐</span> (已就位)\n\n💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">45 秒</span>，請勿關閉對話視窗。`;
+            area.innerHTML = `🔍 系統搜尋進度：92%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">.</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
         }, 14000); 
 
-        // 階段 4：完成 (20秒後)
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "92%";
+            area.innerHTML = `🔍 系統搜尋進度：92%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">..</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 15000); 
+
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "92%";
+            area.innerHTML = `🔍 系統搜尋進度：92%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">...</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 16000); 
+
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "92%";
+            area.innerHTML = `🔍 系統搜尋進度：92%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">.</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 17000);      
+
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "92%";
+            area.innerHTML = `🔍 系統搜尋進度：92%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">..</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 18000); 
+
+        setTimeout(() => {
+            tag.innerText = "媒合中";
+            progress.style.width = "92%";
+            area.innerHTML = `🔍 系統搜尋進度：92%\n<div class="user-list">1️⃣ 您\n2️⃣ 另一位會員加入中 \n3️⃣ 正在等待第三位會員<span class="highlight">...</span></div> 💰 即將為您省下 $533 元！\n一旦配對成功，原價 $1,500 的通行證，您只需支付 <span class="highlight">$967</span>。\n\n預計剩餘等待時間：<span class="highlight">1 分鐘</span>，請勿關閉對話視窗。`;
+        }, 19000);      
+
         setTimeout(() => {
             localStorage.setItem('liff_match_record', JSON.stringify(matchData));
             renderFinalStage(matchData);
@@ -113,7 +189,7 @@
         titleArea.innerHTML = `✨ 配對成功！三人團已達成 ✨`;
         document.getElementById('actionBtn').style.display = "block";
 
-        area.innerHTML = `<div class="user-list">1️⃣ 您 (等待中)\n2️⃣ ${data.mate1_Loc}・${data.mate1_Name}小姐 (已就位)\n3️⃣ ${data.mate2_Loc}・${data.mate2_Name}小姐 (已就位)</div>💰 您的專屬湊團價：<span class="highlight">$967</span>\n\n⚠️ 最後步驟：\n為了保障另外兩位隊友的權益，請於 <span class="highlight">1 小時內</span> 完成結帳。若您逾時未付，系統將自動剔除您的名額，並開放給下一位候補隊友。`;
+        area.innerHTML = `</div>💰 您的專屬湊團價：<span class="highlight">$967</span>\n\n⚠️ 最後步驟：\n為了保障另外兩位隊友的權益，請於 <span class="highlight">1 小時內</span> 完成結帳。若您逾時未付，系統將自動剔除您的名額，並開放給下一位候補隊友。`;
     }
 
     async function completeProcess() {
@@ -123,7 +199,7 @@
         try {
             await liff.sendMessages([{
                 type: 'text',
-                text: `【系統通知】配對成功！\n\n為了保障另外兩位隊友的權益，請於 1 小時內 完成結帳。若您逾時未付，系統將自動剔除您的名額，並開放給下一位候補隊友。\n\n專屬折扣碼：${codeToSend}\n結帳金額：967元\n稍後客服確認配對結果，可完成結帳。`
+                text: `【系統通知】配對成功！\n\n為了保障您的權益，請於 1 小時內 完成結帳。\n\n專屬折扣碼：${codeToSend}\n結帳金額：967元\n稍後客服確認配對結果，可完成結帳。`
             }]);
             liff.closeWindow();
         } catch (e) {
